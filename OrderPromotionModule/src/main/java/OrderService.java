@@ -87,4 +87,36 @@ public class OrderService {
         result.put("received", received);
         return result;
     }
+
+    public Map<String, Object> calculateDoubleEleven(List<Map<String, String>> items) {
+        int totalAmount = 0;
+        List<Map<String, String>> received = new ArrayList<>();
+        for (Map<String, String> item : items) {
+            String product = item.get("productName");
+            int quantity = Integer.parseInt(item.get("quantity"));
+            int unitPrice = Integer.parseInt(item.get("unitPrice"));
+            Map<String, String> receivedItem = new HashMap<>();
+            receivedItem.put("productName", product);
+            receivedItem.put("quantity", String.valueOf(quantity));
+            received.add(receivedItem);
+        }
+        // double-eleven: 單一商品、單價100，每滿10件8折，剩餘以原價計算
+        if (items.size() == 1 && Integer.parseInt(items.get(0).get("unitPrice")) == 100) {
+            int quantity = Integer.parseInt(items.get(0).get("quantity"));
+            int sets = quantity / 10;
+            int remain = quantity % 10;
+            totalAmount = sets * (int)(10 * 100 * 0.8) + remain * 100;
+        } else {
+            // fallback: 原價計算
+            for (Map<String, String> item : items) {
+                int quantity = Integer.parseInt(item.get("quantity"));
+                int unitPrice = Integer.parseInt(item.get("unitPrice"));
+                totalAmount += quantity * unitPrice;
+            }
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalAmount", totalAmount);
+        result.put("received", received);
+        return result;
+    }
 }

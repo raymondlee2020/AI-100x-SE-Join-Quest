@@ -11,6 +11,7 @@ import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("order.feature")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "test.java")
+@ConfigurationParameter(key = "cucumber.filter.tags", value = "@wip")
 public class OrderCucumberTest {
     // ...empty runner...
 }

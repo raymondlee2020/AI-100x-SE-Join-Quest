@@ -88,3 +88,57 @@ Feature: E-commerce Order Pricing Promotions
       | productName | quantity |
       | T-shirt     | 3        |
       | 口紅          | 2        |
+
+  Scenario: Double-eleven promotion - 20% off every set of 10 items - one product
+    Given the double eleven promotion is active
+    When a customer places an order with:
+      | productName | category  | quantity | unitPrice |
+      | 襪子          | apparel   | 12       | 100       |
+    Then the order summary should be:
+      | totalAmount |
+      | 1000        |
+    And the customer should receive:
+      | productName | quantity |
+      | 襪子          | 12       |
+
+  Scenario: Double-eleven promotion - 20% off every set of 10 items - same product twice
+    Given the double eleven promotion is active
+    When a customer places an order with:
+      | productName | category  | quantity | unitPrice |
+      | 襪子          | apparel   | 27       | 100       |
+    Then the order summary should be:
+      | totalAmount |
+      | 2300        |
+    And the customer should receive:
+      | productName | quantity |
+      | 襪子          | 27       |
+
+  Scenario: Double-eleven promotion - 20% off every set of 10 items - ten different products
+    Given the double eleven promotion is active
+    When a customer places an order with:
+      | productName | category  | quantity | unitPrice |
+      | A           | other   | 1        | 100       |
+      | B           | other   | 1        | 100       |
+      | C           | other   | 1        | 100       |
+      | D           | other   | 1        | 100       |
+      | E           | other   | 1        | 100       |
+      | F           | other   | 1        | 100       |
+      | G           | other   | 1        | 100       |
+      | H           | other   | 1        | 100       |
+      | I           | other   | 1        | 100       |
+      | J           | other   | 1        | 100       |
+    Then the order summary should be:
+      | totalAmount |
+      | 1000        |
+    And the customer should receive:
+      | productName | quantity |
+      | A           | 1        |
+      | B           | 1        |
+      | C           | 1        |
+      | D           | 1        |
+      | E           | 1        |
+      | F           | 1        |
+      | G           | 1        |
+      | H           | 1        |
+      | I           | 1        |
+      | J           | 1        |

@@ -18,15 +18,18 @@ public class OrderStepDefs {
     int originalAmount;
     Map<String, Integer> summary;
     boolean bogoCosmeticsActive;
+    boolean doubleElevenActive;
     Map<String, Object> bogoResult;
     Map<String, Object> stackedResult;
     Map<String, Object> thresholdResult;
     Map<String, Object> bogoOnlyResult;
     Map<String, Object> noPromoResult;
+    Map<String, Object> doubleElevenResult;
 
     @Given("no promotions are applied")
     public void noPromotionsAreApplied() {
         bogoCosmeticsActive = false;
+        doubleElevenActive = false;
         threshold = 0;
         discount = 0;
     }
@@ -43,10 +46,17 @@ public class OrderStepDefs {
         bogoCosmeticsActive = true;
     }
 
+    @Given("the double eleven promotion is active")
+    public void doubleElevenPromotionActive() {
+        doubleElevenActive = true;
+    }
+
     @When("a customer places an order with:")
     public void customerPlacesOrder(DataTable table) {
         orderItems = table.asMaps(String.class, String.class);
-        if (bogoCosmeticsActive && threshold > 0) {
+        if (doubleElevenActive) {
+            doubleElevenResult = orderService.calculateDoubleEleven(orderItems);
+        } else if (bogoCosmeticsActive && threshold > 0) {
             stackedResult = orderService.calculateStackedPromotions(orderItems, threshold, discount);
         } else if (bogoCosmeticsActive) {
             bogoOnlyResult = orderService.calculateBogoCosmetics(orderItems);
@@ -82,7 +92,9 @@ public class OrderStepDefs {
     public void orderSummaryShouldBe(DataTable table) {
         Map<String, String> expected = table.asMaps(String.class, String.class).get(0);
         Map<String, Object> actual;
-        if (stackedResult != null) {
+        if (doubleElevenResult != null) {
+            actual = doubleElevenResult;
+        } else if (stackedResult != null) {
             actual = stackedResult;
         } else if (bogoOnlyResult != null) {
             actual = bogoOnlyResult;
@@ -100,7 +112,9 @@ public class OrderStepDefs {
     public void customerShouldReceive(DataTable table) {
         List<Map<String, String>> expected = table.asMaps(String.class, String.class);
         List<Map<String, String>> actual;
-        if (stackedResult != null) {
+        if (doubleElevenResult != null) {
+            actual = (List<Map<String, String>>) doubleElevenResult.get("received");
+        } else if (stackedResult != null) {
             actual = (List<Map<String, String>>) stackedResult.get("received");
         } else if (bogoOnlyResult != null) {
             actual = (List<Map<String, String>>) bogoOnlyResult.get("received");
