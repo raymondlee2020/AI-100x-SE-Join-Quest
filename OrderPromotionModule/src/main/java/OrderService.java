@@ -31,20 +31,29 @@ public class OrderService {
 
     public Map<String, Object> calculateBogoCosmetics(List<Map<String, String>> items) {
         int totalAmount = 0;
-        List<Map<String, String>> received = new ArrayList<>();
+        Map<String, Integer> productQty = new LinkedHashMap<>();
+        Map<String, String> productCategory = new HashMap<>();
         for (Map<String, String> item : items) {
+            String product = item.get("productName");
             String category = item.getOrDefault("category", "");
             int quantity = Integer.parseInt(item.get("quantity"));
             int unitPrice = Integer.parseInt(item.get("unitPrice"));
+            productQty.put(product, productQty.getOrDefault(product, 0) + quantity);
+            productCategory.put(product, category);
+            totalAmount += quantity * unitPrice;
+        }
+        List<Map<String, String>> received = new ArrayList<>();
+        for (String product : productQty.keySet()) {
+            String category = productCategory.get(product);
+            int quantity = productQty.get(product);
             int receivedQty = quantity;
             if ("cosmetics".equalsIgnoreCase(category)) {
-                receivedQty = quantity * 2;
+                receivedQty = (quantity >= 2) ? quantity + 1 : 2;
             }
             Map<String, String> receivedItem = new HashMap<>();
-            receivedItem.put("productName", item.get("productName"));
+            receivedItem.put("productName", product);
             receivedItem.put("quantity", String.valueOf(receivedQty));
             received.add(receivedItem);
-            totalAmount += quantity * unitPrice;
         }
         Map<String, Object> result = new HashMap<>();
         result.put("totalAmount", totalAmount);
